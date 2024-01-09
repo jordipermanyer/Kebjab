@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 
     public Image Barfill;
     public float gameTime;
+    private float initialGameTime;
     private AudioSource sound;
     private bool gameStarted = false;
     private bool gameIsLost = false;
@@ -24,6 +25,9 @@ public class GameManager : MonoBehaviour
     GameObject HighScoreCanvas;
     GameObject StartMenuCanvas;
     GameObject MainGameCanvas;
+    GameObject Instructionscanvas;
+    GameObject InstructionsBtn;
+    GameObject InstructionsArrow;
     GameObject LifesCanvas;
     GameObject TimeOuTxt;
     GameObject Youloosetext;
@@ -63,12 +67,16 @@ public class GameManager : MonoBehaviour
         pitidoFinal = SoundManager.instance.pitidoFinal;
         MainScoreCanvas = UiManager.instance.ScoretextCanvas;
         HighScoreCanvas = UiManager.instance.HighScoretextCanvas;
+        Instructionscanvas = UiManager.instance.InstructionsImage;
+        InstructionsArrow = UiManager.instance.InstructionsArrow;
+        InstructionsBtn = UiManager.instance.InstructionsBtn;
         LifesCanvas = UiManager.instance.LifesCanvas;
         TimeOuTxt = UiManager.instance.TimeOuttext;
         Youloosetext = UiManager.instance.Youloosetext;
         ScorePoints = UiManager.instance.scorepoints;
         HighScorePoints = UiManager.instance.HighScorepoints;
         sound.PlayOneShot(MenuSong);
+        initialGameTime = gameTime;
 
     }
 
@@ -80,6 +88,7 @@ public class GameManager : MonoBehaviour
             kebabSpawnManager.instance.StartSpawn();
             ScorePoints.text = ScoreManager.instance.currentScore.ToString();
         }
+
     }
 
     public void StartGame()
@@ -87,6 +96,7 @@ public class GameManager : MonoBehaviour
         gameIsLost = false;
         TOPkebabdestroyer.SetActive(false);
         ScoreManager.instance.resetHisghScore();
+        Barfill.fillAmount = 1;
         gameStarted = true;
         Debug.Log("Game started");
         MainGameCanvas.SetActive(true);
@@ -114,10 +124,10 @@ public class GameManager : MonoBehaviour
     public void restartMatch()
     {
         gameIsLost = false;
-        gameTime = 10;
+        gameTime = initialGameTime;
         LifesCanvas.SetActive(true);
+        Barfill.fillAmount = 1;
         ScoreManager.instance.restartlifes();
-        UiManager.instance.life1.sprite = UiManager.instance.kebabOriginal;
         ScoreManager.instance.currentScore = 0;
         TOPkebabdestroyer.SetActive(false);
         MainGameCanvas.SetActive(true);
@@ -180,15 +190,28 @@ public class GameManager : MonoBehaviour
 
     }
 
+    private IEnumerator disableArrow()
+    {
+        yield return new WaitForSeconds(2.5f);
+        InstructionsArrow.SetActive(false);
+
+    }
+
 
 
     public void SelectInstructions()
     {
         Debug.Log("instructions selected");
+        InstructionsBtn.SetActive(false);
+        Instructionscanvas.SetActive(true);
+        InstructionsArrow.SetActive(true);
+        StartCoroutine(disableArrow());
+        
     }
 
     private void EndGame()
     {
+        Barfill.fillAmount = 0;
         LifesCanvas.SetActive(false);
         TOPkebabdestroyer.SetActive(true);
         gameStarted = false;
@@ -200,7 +223,10 @@ public class GameManager : MonoBehaviour
 
     public void GameLost()
     {
+        Barfill.fillAmount = 0;
         gameIsLost = true;
+        StopAllCoroutines();
+        gameTime = 0;
         LifesCanvas.SetActive(false);
         TOPkebabdestroyer.SetActive(true);
         gameStarted = false;

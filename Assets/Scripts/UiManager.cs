@@ -9,6 +9,9 @@ public class UiManager : MonoBehaviour
     public GameObject StartMenuCanvas;
     public GameObject MainGameCanvas;
     public GameObject GameOverCanvas;
+    public GameObject InstructionsImage;
+    public GameObject InstructionsBtn;
+    public GameObject InstructionsArrow;
     public GameObject LifesCanvas;
     public Image life1;
     public Image life2;
