@@ -11,6 +11,7 @@ public class SoundManager : MonoBehaviour
     public AudioClip slice;
     public AudioClip Btnsound;
     public AudioClip MenuSong;
+    public AudioClip GameLost;
 
     public static SoundManager instance;
 

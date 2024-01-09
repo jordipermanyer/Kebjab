@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class KebabDestroyer : MonoBehaviour
 {
     AudioClip kebabSplash;
     private AudioSource sound;
-    public GameObject kebabTallat;
+    
 
     void Start()
     {
@@ -16,12 +17,19 @@ public class KebabDestroyer : MonoBehaviour
     // Start is called before the first frame update
     private void OnTriggerEnter(Collider col)
     {
-        if (col.gameObject.CompareTag("kebab") || (col.gameObject.CompareTag("kebabPartido")))
+        if (col.gameObject.CompareTag("kebab"))
         {
             Destroy(col.gameObject);
             sound.PlayOneShot(kebabSplash);
-            //ScoreManager.instance.AddScore();
             Debug.Log("Object Destroyed");
+            ScoreManager.instance.looseLife();
+            
+
         }
+        if (col.gameObject.CompareTag("kebabPartido"))
+        {
+            Destroy(col.gameObject);
+        }
+
     }
 }

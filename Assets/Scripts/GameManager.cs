@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     public float gameTime;
     private AudioSource sound;
     private bool gameStarted = false;
+    private bool gameIsLost = false;
     public GameObject TOPkebabdestroyer;
 
     
@@ -23,7 +24,9 @@ public class GameManager : MonoBehaviour
     GameObject HighScoreCanvas;
     GameObject StartMenuCanvas;
     GameObject MainGameCanvas;
+    GameObject LifesCanvas;
     GameObject TimeOuTxt;
+    GameObject Youloosetext;
     TextMeshProUGUI ScorePoints;
     TextMeshProUGUI HighScorePoints;
 
@@ -32,6 +35,7 @@ public class GameManager : MonoBehaviour
     AudioClip pitidoFinal;
     AudioClip empiezaElJuego;
     AudioClip MenuSong;
+    AudioClip GameLostAudio;
 
     public static GameManager instance;
     private void Awake()
@@ -55,10 +59,13 @@ public class GameManager : MonoBehaviour
         mainTheme = SoundManager.instance.Maintheme;
         MenuSong = SoundManager.instance.MenuSong;
         empiezaElJuego = SoundManager.instance.empiezaEljuego;
+        GameLostAudio = SoundManager.instance.GameLost;
         pitidoFinal = SoundManager.instance.pitidoFinal;
         MainScoreCanvas = UiManager.instance.ScoretextCanvas;
         HighScoreCanvas = UiManager.instance.HighScoretextCanvas;
+        LifesCanvas = UiManager.instance.LifesCanvas;
         TimeOuTxt = UiManager.instance.TimeOuttext;
+        Youloosetext = UiManager.instance.Youloosetext;
         ScorePoints = UiManager.instance.scorepoints;
         HighScorePoints = UiManager.instance.HighScorepoints;
         sound.PlayOneShot(MenuSong);
@@ -77,6 +84,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        gameIsLost = false;
         TOPkebabdestroyer.SetActive(false);
         ScoreManager.instance.resetHisghScore();
         gameStarted = true;
@@ -105,6 +113,11 @@ public class GameManager : MonoBehaviour
 
     public void restartMatch()
     {
+        gameIsLost = false;
+        gameTime = 10;
+        LifesCanvas.SetActive(true);
+        ScoreManager.instance.restartlifes();
+        UiManager.instance.life1.sprite = UiManager.instance.kebabOriginal;
         ScoreManager.instance.currentScore = 0;
         TOPkebabdestroyer.SetActive(false);
         MainGameCanvas.SetActive(true);
@@ -117,6 +130,7 @@ public class GameManager : MonoBehaviour
         StartCoroutine(StartTimer(gameTime));
         GameOverCanvas.SetActive(false);
         TimeOuTxt.SetActive(false);
+        Youloosetext.SetActive(false);
         HighScoreCanvas.SetActive(false);
     }
 
@@ -132,7 +146,11 @@ public class GameManager : MonoBehaviour
 
 
         }
-        EndGame();
+        if (gameIsLost == false)
+        {
+            EndGame();
+        }
+        
     }
 
     private IEnumerator ShowHighScore()
@@ -144,6 +162,16 @@ public class GameManager : MonoBehaviour
         HighScoreCanvas.SetActive(true);
         HighScorePoints.text = PlayerPrefs.GetInt("HighscoreNum", 0).ToString();
     }
+    private IEnumerator ShowHighScoreWhenGameLost()
+    {
+        MainScoreCanvas.SetActive(false);
+        Youloosetext.SetActive(true);
+        yield return new WaitForSeconds(1.2f);
+        Youloosetext.SetActive(false);
+        HighScoreCanvas.SetActive(true);
+        HighScorePoints.text = PlayerPrefs.GetInt("HighscoreNum", 0).ToString();
+    }
+
 
     private IEnumerator WaitForEndGameCanvas()
     {
@@ -161,15 +189,28 @@ public class GameManager : MonoBehaviour
 
     private void EndGame()
     {
+        LifesCanvas.SetActive(false);
         TOPkebabdestroyer.SetActive(true);
         gameStarted = false;
         StartCoroutine(ShowHighScore());
         sound.Stop();
         sound.PlayOneShot(pitidoFinal);
         StartCoroutine(WaitForEndGameCanvas());
-        
-        
     }
+
+    public void GameLost()
+    {
+        gameIsLost = true;
+        LifesCanvas.SetActive(false);
+        TOPkebabdestroyer.SetActive(true);
+        gameStarted = false;
+        StartCoroutine(ShowHighScoreWhenGameLost());
+        sound.Stop();
+        sound.PlayOneShot(GameLostAudio);
+        StartCoroutine(WaitForEndGameCanvas());
+    }
+
+
 
     public void ExitGame()
     {
